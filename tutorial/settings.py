@@ -10,6 +10,9 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import djcelery
+from datetime import timedelta
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -41,6 +44,7 @@ INSTALLED_APPS = (
 
     # third party
     # 'tastypie'
+    'djcelery',
 
     # project
     'books',
@@ -95,3 +99,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#################################### CELERY ##########################
+djcelery.setup_loader()
+BROKER_POOL_LIMIT = 1
+CELERYD_CONCURRENCY = 5
+BROKER_URL = 'redis://127.0.0.1:6379/0' 
+CELERY_TASK_RESULT_EXPIRES = timedelta(minutes=30)
+CELERY_RESULT_BACKEND = 'database'
+CELERY_TIMEZONE = TIME_ZONE
+
+try:
+    from local_settings import *
+except:
+    pass
+
+

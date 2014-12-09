@@ -1,5 +1,15 @@
+
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from tastypie.api import Api
+from publishers.resources.publisher import PublisherResource
+from books.resources.book import BookResource
+# publisher_resource = PublisherResource() 
+
+
+public_api = Api(api_name='public')
+public_api.register(PublisherResource())
+public_api.register(BookResource())
 
 
 urlpatterns = patterns('',
@@ -10,8 +20,11 @@ urlpatterns = patterns('',
     url(r'^books/','books.views.books'),    
     url(r'^admin/', include(admin.site.urls)),
  	url(r'^json/','books.views.home_json'),
-    url(r'', 'books.views.home'),
+    url(r'api/',  include(public_api.urls)),
 
+
+    url(r'task_result/','books.views.task_result'),
+    url(r'', 'books.views.home'),
 
 
  )

@@ -1,17 +1,29 @@
 # from django.shortcuts import render
 
+from celery.result import AsyncResult
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.shortcuts import render_to_response
 from django import template
 from django.conf import settings
 from .models import *
-
+from .tasks import add
 import json 
 
 def home(request):
-	return HttpResponse("<htmL><body><h1>Welcome to my store</h1></body></html>")
+	ar = add.delay(5,8)
+	# ar.get()
+	return HttpResponse("<htmL><body><h1>Welcome to my store</h1><h2>Task ID: %s %s</h2></body></html>" % (ar.id, ar.status))
 
+
+def task_result(request):
+	task_id = request.GET.get('task')
+	result = AsyncResult(task_id)
+	if result.ready():
+		data = result.get()
+		return HttpResponse("<htmL><body><h1>Result: %s</h1></body></html>" % data)
+	else:
+		return HttpResponse("<htmL><body><h1>Not Ready</h1></body></html>")
 
 def home_json(request):
 	data = {
